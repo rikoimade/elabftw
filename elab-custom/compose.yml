@@ -1,0 +1,71 @@
+name: elabftw
+
+services:
+  elabftw:
+    image: riko/elabftw-gcs-fix:1.0  
+    container_name: elabftw
+    restart: unless-stopped
+    ports:
+      - "2443:443"           # HTTPS port (change first number)
+      # - "80:80"           # optional HTTP (redirects to HTTPS by default)
+    environment:
+      # ── Database (local MySQL container) ──
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=elabftw
+      - DB_USER=elabftw
+      - DB_PASSWORD=ChangeThisStrongPassword123!
+
+      # ── Timezone ──
+      - PHP_TIMEZONE=Asia/Singapore
+      - TZ=Asia/Singapore
+
+      # ── eLabFTW core settings ──
+      - SECRET_KEY=super_long_random_secret_key_at_least_32_chars_change_me
+      - SITE_URL=https://eln.imre.a-star.edu.sg   # ← your real domain
+      - SERVER_NAME=eln.imre.a-star.edu.sg
+
+      # ── Disable HTTPS in container if testing locally without certs
+      # - DISABLE_HTTPS=true
+
+      # ── Optional: max upload size (in MB)
+      # - MAX_UPLOAD_SIZE=100M
+
+      # If you later switch back to GCS/S3:
+      # - ELAB_AWS_ACCESS_KEY=...
+      # - ELAB_AWS_SECRET_KEY=...
+      # - ELAB_AWS_REGION=asia-southeast1
+      # - ELAB_AWS_ENDPOINT=https://storage.googleapis.com
+
+    volumes:
+      - elabftw_uploads:/elabftw/uploads
+      # If you want persistent config / cache (optional but recommended)
+      # - elabftw_data:/elabftw/web/var
+
+    depends_on:
+      - db
+    networks:
+      - elab-net
+
+  db:
+    image: mysql:8.4
+    container_name: elabftw-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=RootSuperStrongPass456!
+      - MYSQL_DATABASE=elabftw
+      - MYSQL_USER=elabftw
+      - MYSQL_PASSWORD=ChangeThisStrongPassword123!
+    volumes:
+      - elabftw_db:/var/lib/mysql
+    networks:
+      - elab-net
+
+volumes:
+  elabftw_uploads:
+  elabftw_db:
+  # elabftw_data:   # uncomment if using
+
+networks:
+  elab-net:
+    driver: bridge

@@ -1,0 +1,1 @@
+docker build -t riko/elabftw-custom:5.3.11-patch1 .
