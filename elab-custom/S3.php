@@ -12,15 +12,11 @@ declare(strict_types=1);
 
 namespace Elabftw\Storage;
 
-use Aws\Credentials\CredentialsInterface;
 use Aws\S3\S3Client;
 use Aws\S3\S3ClientInterface;
-use Elabftw\Elabftw\S3Config;
+use Elabftw\Models\Config;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
-use League\Flysystem\AwsS3V3\PortableVisibilityConverter;
 use League\Flysystem\FilesystemAdapter;
-use League\Flysystem\Visibility;
-use Override;
 
 /**
  * Provide a League\Filesystem adapter for S3 buckets file uploads
@@ -32,18 +28,14 @@ class S3 extends AbstractStorage
     // 100 Mb
     protected const int PART_SIZE = 104857600;
 
-    use Elabftw\Models\Config;
-    
     public function __construct(
-        protected readonly S3Config $config,
+        protected readonly Config $config,
     ) {}
 
-    #[Override]
     public function getPath(string $relativePath = ''): string
     {
         return $this->config->pathPrefix . ($relativePath !== '' ? '/' . $relativePath : '');
     }
-
 
     public function getAbsoluteUri(string $path): string
     {
@@ -51,7 +43,6 @@ class S3 extends AbstractStorage
         return 's3://' . $this->config->bucketName . '/' . $this->getPath($path);
     }
 
-    #[Override]
     protected function getAdapter(): FilesystemAdapter
     {
         $client = $this->getClient();
@@ -65,7 +56,7 @@ class S3 extends AbstractStorage
             // Optional path prefix
             $this->config->pathPrefix,
             // set a larger part size for multipart upload or we hit the max number of parts (1000)
-            options: array('part_size' => self::PART_SIZE),
+            options: ['part_size' => self::PART_SIZE],
         );
     }
 
@@ -75,12 +66,15 @@ class S3 extends AbstractStorage
             'version' => self::S3_VERSION,
             'region' => $this->config->region,
             'endpoint' => $this->config->endpoint,
-            'credentials' => $this->credentials,
+            'credentials' => [
+                'key'    => $this->config->accessKey ?? '',
+                'secret' => $this->config->secretKey ?? '',
+            ],
             'use_aws_shared_config_files' => false,
             'use_path_style_endpoint' => $this->config->usePathStyleEndpoint,
-            'http' => array(
+            'http' => [
                 'verify' => $this->config->verifyCert,
-            ),
+            ],
         ));
     }
 }
