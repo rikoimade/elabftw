@@ -31,12 +31,13 @@ class S3 extends AbstractStorage
 
     public function getPath(string $relativePath = ''): string
     {
-        return $this->config->get('path_prefix') . ($relativePath !== '' ? '/' . $relativePath : '');
+        return ($this->config->path_prefix ?? '') . ($relativePath !== '' ? '/' . $relativePath : '');
     }
 
     public function getAbsoluteUri(string $path): string
     {
-        return 's3://' . $this->config->get('bucket_name') . '/' . $this->getPath($path);
+        return 's3://' . ($this->config->bucket_name ?? '') . '/' . $this->getPath($path);
+
     }
 
     protected function getAdapter(): FilesystemAdapter
@@ -46,8 +47,8 @@ class S3 extends AbstractStorage
 
         return new AwsS3V3Adapter(
             $client,
-            $this->config->get('bucket_name'),
-            $this->config->get('path_prefix'),
+            $this->config->bucket_name ?? '',
+            $this->config->path_prefix ?? '',
             options: ['part_size' => self::PART_SIZE],
         );
     }
@@ -56,16 +57,16 @@ class S3 extends AbstractStorage
     {
         return new S3Client([
             'version'     => self::S3_VERSION,
-            'region'      => $this->config->get('aws_region') ?? 'asia-southeast1',
-            'endpoint'    => $this->config->get('aws_endpoint') ?? 'https://storage.googleapis.com',
+            'region'      => $this->config->aws_region ?? 'asia-southeast1',
+            'endpoint'    => $this->config->aws_endpoint ?? 'https://storage.googleapis.com',
             'credentials' => [
-                'key'    => $this->config->get('aws_access_key') ?? '',
-                'secret' => $this->config->get('aws_secret_key') ?? '',
+                'key'    => $this->config->aws_access_key ?? '',
+                'secret' => $this->config->aws_secret_key ?? '',
             ],
             'use_aws_shared_config_files' => false,
-            'use_path_style_endpoint'     => (bool) $this->config->get('aws_use_path_style_endpoint'),
+            'use_path_style_endpoint'     => (bool) ($this->config->aws_use_path_style_endpoint ?? false),
             'http' => [
-                'verify' => (bool) $this->config->get('aws_verify_cert', true),
+                'verify' => (bool) ($this->config->aws_verify_cert ?? true),
             ],
         ]);
     }
