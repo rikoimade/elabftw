@@ -49,17 +49,16 @@ class S3 extends AbstractStorage
         $client = $this->getClient();
         $client->registerStreamWrapper();
 
-        // return new AwsS3V3Adapter(
-        //     $client,
-        //     $this->config->s3_bucket_name ?? '',
-        //     $this->config->s3_path_prefix ?? '',
-        //     options: ['part_size' => self::PART_SIZE],
-        // );
-
-        // temporary hardcode for debug
-        $bucket = 'imre-elabftw-bucket-20261214'; 
-
-        return new AwsS3V3Adapter($client, $bucket, $this->config->path_prefix ?? '', options: ['part_size' => self::PART_SIZE]);
+        return new AwsS3V3Adapter(
+            $client,
+            $this->config->s3_bucket_name ?? '',
+            $this->config->s3_path_prefix ?? '',
+            options: [
+                'part_size' => self::PART_SIZE,
+                'ACL' => null,                     // ← force no ACL
+                'disable_md5' => true,
+            ],
+        );
     }
 
     protected function getClient(): S3ClientInterface
