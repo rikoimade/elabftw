@@ -48,7 +48,7 @@ class S3 extends AbstractStorage
         return new AwsS3V3Adapter(
             $client,
             $this->config->s3_bucket_name ?? '',
-            $this->config->path_prefix ?? '',
+            $this->config->s3_path_prefix ?? '',
             options: ['part_size' => self::PART_SIZE],
         );
     }
@@ -57,16 +57,16 @@ class S3 extends AbstractStorage
     {
         return new S3Client([
             'version'     => self::S3_VERSION,
-            'region'      => $this->config->aws_region ?? 'asia-southeast1',
-            'endpoint'    => $this->config->aws_endpoint ?? 'https://storage.googleapis.com',
+            'region'      => $this->config->s3_region ?? 'asia-southeast1',
+            'endpoint'    => $this->config->s3_endpoint ?? 'https://storage.googleapis.com',
             'credentials' => [
-                'key'    => $this->config->aws_access_key ?? '',
-                'secret' => $this->config->aws_secret_key ?? '',
+                'key'    => $this->config->s3_access_key ?? '',
+                'secret' => $this->config->s3_secret_key ?? '',
             ],
             'use_aws_shared_config_files' => false,
-            'use_path_style_endpoint'     => (bool) ($this->config->aws_use_path_style_endpoint ?? false),
+            'use_path_style_endpoint'     => (bool) ($this->config->s3_use_path_style_endpoint ?? false),
             'http' => [
-                'verify' => (bool) ($this->config->aws_verify_cert ?? true),
+                'verify' => (bool) ($this->config->s3_verify_cert ?? true),
             ],
         ]);
     }
