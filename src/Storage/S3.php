@@ -63,8 +63,6 @@ class S3 extends AbstractStorage
             $this->config->bucketName,
             // Optional path prefix
             $this->config->pathPrefix,
-            // Visibility converter (League\Flysystem\AwsS3V3\VisibilityConverter)
-            new PortableVisibilityConverter(Visibility::PRIVATE),
             // set a larger part size for multipart upload or we hit the max number of parts (1000)
             options: array('part_size' => self::PART_SIZE),
         );
