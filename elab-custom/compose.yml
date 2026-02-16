@@ -2,7 +2,7 @@ name: elabftw
 
 services:
   elabftw:
-    image: riko/elabftw-gcs-fix:1.0  
+    image: riko/elabftw-custom:5.3.11-patch2 
     container_name: elabftw
     restart: unless-stopped
     ports:
