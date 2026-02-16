@@ -43,7 +43,7 @@ class S3 extends AbstractStorage
         return $this->config->pathPrefix . ($relativePath !== '' ? '/' . $relativePath : '');
     }
 
-    #[Override]
+
     public function getAbsoluteUri(string $path): string
     {
         // https://maennchen.dev/ZipStream-PHP/guide/StreamOutput.html#stream-to-s3-bucket
