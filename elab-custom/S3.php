@@ -36,7 +36,11 @@ class S3 extends AbstractStorage
 
     public function getAbsoluteUri(string $path): string
     {
-        return 's3://' . ($this->config->s3_bucket_name ?? '') . '/' . $this->getPath($path);
+        // return 's3://' . ($this->config->s3_bucket_name ?? '') . '/' . $this->getPath($path);
+
+        //temporary hardcoded for debugging
+        $bucket = 'imre-elabftw-bucket-20261214';
+        return 's3://' . $bucket . '/' . $this->getPath($path);
 
     }
 
@@ -45,12 +49,17 @@ class S3 extends AbstractStorage
         $client = $this->getClient();
         $client->registerStreamWrapper();
 
-        return new AwsS3V3Adapter(
-            $client,
-            $this->config->s3_bucket_name ?? '',
-            $this->config->s3_path_prefix ?? '',
-            options: ['part_size' => self::PART_SIZE],
-        );
+        // return new AwsS3V3Adapter(
+        //     $client,
+        //     $this->config->s3_bucket_name ?? '',
+        //     $this->config->s3_path_prefix ?? '',
+        //     options: ['part_size' => self::PART_SIZE],
+        // );
+
+        // temporary hardcode for debug
+        $bucket = 'imre-elabftw-bucket-20261214'; 
+
+        return new AwsS3V3Adapter($client, $bucket, $this->config->path_prefix ?? '', options: ['part_size' => self::PART_SIZE]);
     }
 
     protected function getClient(): S3ClientInterface
