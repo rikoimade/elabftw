@@ -34,27 +34,26 @@ class S3 extends AbstractStorage
 
     public function getPath(string $relativePath = ''): string
     {
-        return $this->config->pathPrefix . ($relativePath !== '' ? '/' . $relativePath : '');
+        return $this->config->get('path_prefix') . ($relativePath !== '' ? '/' . $relativePath : '');
     }
 
     public function getAbsoluteUri(string $path): string
     {
-        // https://maennchen.dev/ZipStream-PHP/guide/StreamOutput.html#stream-to-s3-bucket
-        return 's3://' . $this->config->bucketName . '/' . $this->getPath($path);
+        return 's3://' . $this->config->get('bucket_name') . '/' . $this->getPath($path);
+    }
     }
 
     protected function getAdapter(): FilesystemAdapter
     {
         $client = $this->getClient();
-        // we register the wrapper here so we can do fopen() calls to s3
         $client->registerStreamWrapper();
         return new AwsS3V3Adapter(
             // S3Client
             $client,
             // Bucket name
-            $this->config->bucketName,
+            $this->config->get('bucket_name'),
             // Optional path prefix
-            $this->config->pathPrefix,
+            $this->config->get('path_prefix'),
             // set a larger part size for multipart upload or we hit the max number of parts (1000)
             options: ['part_size' => self::PART_SIZE],
         );
@@ -64,16 +63,16 @@ class S3 extends AbstractStorage
     {
         return new S3Client(array(
             'version' => self::S3_VERSION,
-            'region' => $this->config->region,
-            'endpoint' => $this->config->endpoint,
+            'region' => $this->config->get('aws_region') ?? 'asia-southeast1',
+            'endpoint' => $this->config->get('aws_endpoint') ?? 'https://storage.googleapis.com',
             'credentials' => [
                 'key'    => $this->config->accessKey ?? '',
                 'secret' => $this->config->secretKey ?? '',
             ],
             'use_aws_shared_config_files' => false,
-            'use_path_style_endpoint' => $this->config->usePathStyleEndpoint,
+            'use_path_style_endpoint'     => (bool) $this->config->get('aws_use_path_style_endpoint'),
             'http' => [
-                'verify' => $this->config->verifyCert,
+                'verify' => (bool) $this->config->get('aws_verify_cert', true),
             ],
         ));
     }
