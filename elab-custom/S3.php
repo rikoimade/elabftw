@@ -49,9 +49,12 @@ class S3 extends AbstractStorage
         $client = $this->getClient();
         $client->registerStreamWrapper();
 
+        //temporary hard coded
+        $bucket = 'imre-elabftw-bucket-20261214';
+
         return new AwsS3V3Adapter(
             $client,
-            $this->config->s3_bucket_name ?? '',
+            $bucket, 
             $this->config->s3_path_prefix ?? '',
             options: [
                 'part_size' => self::PART_SIZE,
