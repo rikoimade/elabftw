@@ -32,8 +32,9 @@ class S3 extends AbstractStorage
     // 100 Mb
     protected const int PART_SIZE = 104857600;
 
+    use Elabftw\Models\Config;
+    
     public function __construct(
-        protected readonly CredentialsInterface $credentials,
         protected readonly S3Config $config,
     ) {}
 
