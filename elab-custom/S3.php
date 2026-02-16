@@ -36,7 +36,7 @@ class S3 extends AbstractStorage
 
     public function getAbsoluteUri(string $path): string
     {
-        return 's3://' . ($this->config->bucket_name ?? '') . '/' . $this->getPath($path);
+        return 's3://' . ($this->config->s3_bucket_name ?? '') . '/' . $this->getPath($path);
 
     }
 
@@ -47,7 +47,7 @@ class S3 extends AbstractStorage
 
         return new AwsS3V3Adapter(
             $client,
-            $this->config->bucket_name ?? '',
+            $this->config->s3_bucket_name ?? '',
             $this->config->path_prefix ?? '',
             options: ['part_size' => self::PART_SIZE],
         );
